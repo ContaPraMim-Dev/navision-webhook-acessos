@@ -1,0 +1,135 @@
+================================================================================
+                      WEBHOOK DE ACESSOS - NAVISION
+================================================================================
+
+ENDPOINT
+--------
+POST https://api.navisionapp.online/webhooks/acessos
+
+
+AUTENTICACAO
+------------
+A autenticacao e feita via header X-Api-Key.
+
+Header      | Valor
+------------|------------------
+X-Api-Key   | <sua_api_key>
+
+
+REQUEST
+-------
+
+Headers:
+  Content-Type: application/json
+  X-Api-Key: <sua_api_key>
+
+Body:
+{
+  "event_id": "b7e2b9c9-4f3a-4e1d-9f6c-7c6f0c9e9d2a",
+  "event_type": "acessos",
+  "data": {
+    "isps_code": "A7A2B4F1",
+    "nome_completo": "JOSUEL DA SILVA",
+    "tipo_acesso": "VERMELHO",
+    "motivacao_inicio": "2023-01-23",
+    "motivacao_fim": "2028-11-25T23:59:59-03:00",
+    "empresa": "AUTORIDADE PORTUARIA DE SANTOS",
+    "id_foto": 399,
+    "gate": 10
+  }
+}
+
+
+CAMPOS
+------
+Campo                   | Tipo    | Obrigatorio | Descricao
+------------------------|---------|-------------|------------------------------------------
+event_id                | UUID    | Sim         | Identificador unico do evento (formato UUID)
+event_type              | string  | Sim         | Tipo do evento. Para acessos, usar: acessos
+data                    | object  | Sim         | Objeto contendo os dados do acesso
+data.isps_code          | string  | Sim         | Codigo ISPS do usuario
+data.nome_completo      | string  | Sim         | Nome completo do usuario
+data.tipo_acesso        | string  | Sim         | Tipo de acesso: VERMELHO ou VERDE
+data.motivacao_inicio   | string  | Sim         | Data de inicio (formato: yyyy-mm-dd)
+data.motivacao_fim      | string  | Sim         | Data/hora de fim (formato ISO 8601)
+data.empresa            | string  | Sim         | Nome da empresa
+data.id_foto            | integer | Sim         | ID da foto do usuario
+data.gate               | integer | Sim         | Numero do gate de acesso
+
+
+RESPONSES
+---------
+
+200 OK - Sucesso
+{
+  "status": "sucesso"
+}
+
+--------------------------------------------------------------------------------
+
+400 Bad Request - Parametros invalidos
+{
+  "status": "erro",
+  "mensagem": "Erro de requisicao — <descricao do erro>"
+}
+
+Possiveis mensagens de erro:
+  - event_type e obrigatorio.
+  - event_type '<valor>' nao e valido.
+  - event_id deve ser um UUID valido.
+  - data deve ser um objeto.
+  - isps_code deve ser uma string.
+  - nome_completo deve ser uma string.
+  - tipo_acesso deve ser VERMELHO ou VERDE.
+  - motivacao_inicio deve estar no formato yyyy-mm-dd.
+  - motivacao_fim deve estar no formato ISO 8601 (ex: 2028-11-25T23:59:59-03:00).
+  - empresa deve ser uma string.
+  - id_foto deve ser um inteiro.
+  - gate deve ser um inteiro.
+
+--------------------------------------------------------------------------------
+
+401 Unauthorized - API Key invalida
+{
+  "status": "erro",
+  "mensagem": "Chave de API nao autorizada."
+}
+
+--------------------------------------------------------------------------------
+
+409 Conflict - Evento duplicado
+{
+  "status": "erro",
+  "mensagem": "Conflito — evento ja registrado."
+}
+
+--------------------------------------------------------------------------------
+
+500 Internal Server Error - Erro interno
+{
+  "status": "erro",
+  "mensagem": "Erro interno do servidor."
+}
+
+
+EXEMPLO COM cURL
+----------------
+curl -X POST https://api.navisionapp.online/webhooks/acessos \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: <sua_api_key>" \
+  -d '{
+    "event_id": "b7e2b9c9-4f3a-4e1d-9f6c-7c6f0c9e9d2a",
+    "event_type": "acessos",
+    "data": {
+      "isps_code": "A7A2B4F1",
+      "nome_completo": "JOSUEL DA SILVA",
+      "tipo_acesso": "VERMELHO",
+      "motivacao_inicio": "2023-01-23",
+      "motivacao_fim": "2028-11-25T23:59:59-03:00",
+      "empresa": "AUTORIDADE PORTUARIA DE SANTOS",
+      "id_foto": 399,
+      "gate": 10
+    }
+  }'
+
+================================================================================
